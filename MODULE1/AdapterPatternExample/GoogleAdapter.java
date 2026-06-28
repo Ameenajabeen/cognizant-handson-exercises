@@ -1,5 +1,6 @@
 package MODULE1.AdapterPatternExample;
 
+//bridge class to adapt GooglePayment to PaymentProcessor interface
 public class GoogleAdapter implements PaymentProcessor {
     private GooglePayment googlepayment;
 

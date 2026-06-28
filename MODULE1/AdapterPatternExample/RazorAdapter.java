@@ -1,5 +1,6 @@
 package MODULE1.AdapterPatternExample;
 
+//bridge class to adapt RazorPayPayment to PaymentProcessor interface
 public class RazorAdapter implements PaymentProcessor {
     private RazorPayPayment razorPayPayment;
 

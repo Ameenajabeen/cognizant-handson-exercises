@@ -1,5 +1,6 @@
 package MODULE1.AdapterPatternExample;
 
+//bridge class that adapts PayPalPayment to PaymentProcessor interface
 public class PayPalAdapter implements PaymentProcessor {
     private PayPalPayment payPalPayment;
 
