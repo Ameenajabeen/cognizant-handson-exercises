@@ -1,6 +1,6 @@
 public class Product {
 
-    private int productId;
+    int productId;
     private String productName;
     private int quantity;
     private double price;
@@ -10,6 +10,10 @@ public class Product {
         this.productName = productName;
         this.quantity = quantity;
         this.price = price;
+    }
+
+    public Product(int id, String name, String category) {
+        // TODO Auto-generated constructor stub
     }
 
     public int getProductId() {

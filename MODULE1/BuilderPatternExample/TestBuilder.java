@@ -11,6 +11,7 @@ class TestBuilder {
         System.out.println(gamingComputer);
 
         Computer officeComputer = new Computer.Builder("Intel i5", "8GB")
+                .setStorage("500GB HDD")
                 .build();
 
         System.out.println(officeComputer);
