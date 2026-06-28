@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
--- Module-03 :: Schema Setup
+-- MODULE3
+ :: Schema Setup
 -- Creates the base tables used throughout all exercises.
 -- Run this script FIRST, before any other script in this module.
 --------------------------------------------------------------------------------
