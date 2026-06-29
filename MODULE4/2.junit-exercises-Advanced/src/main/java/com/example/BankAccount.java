@@ -1,5 +1,3 @@
-package com.example;
-
 /**
  * Exercise 4: BankAccount class to demonstrate AAA pattern
  * with setup and teardown.
