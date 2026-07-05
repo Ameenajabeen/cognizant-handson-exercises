@@ -1,6 +1,6 @@
 # Spring REST using Spring Boot 3 - Hands On 1
 
-Create a Spring Web Project using Maven
+1.Create a Spring Web Project using Maven
 
 ## Objective
 To create a Spring Web Project using Maven and understand the project structure, Spring Boot application startup process, Maven configuration, and dependency management.
