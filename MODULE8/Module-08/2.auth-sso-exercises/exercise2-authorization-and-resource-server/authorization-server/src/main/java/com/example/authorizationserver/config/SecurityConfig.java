@@ -3,6 +3,7 @@ package com.example.authorizationserver.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.core.userdetails.User;
@@ -15,12 +16,12 @@ import org.springframework.security.web.SecurityFilterChain;
 /**
  * Two filter chains, following the standard Spring Authorization Server
  * layout:
- *  1. authorizationServerSecurityFilterChain (Order 1) — handles the
- *     OAuth2/OIDC protocol endpoints (/oauth2/token, /oauth2/authorize,
- *     /.well-known/openid-configuration, etc).
- *  2. defaultSecurityFilterChain (Order 2) — handles everything else,
- *     in particular the login form shown when a user authorizes the
- *     "my-client" authorization_code flow.
+ * 1. authorizationServerSecurityFilterChain (Order 1) — handles the
+ * OAuth2/OIDC protocol endpoints (/oauth2/token, /oauth2/authorize,
+ * /.well-known/openid-configuration, etc).
+ * 2. defaultSecurityFilterChain (Order 2) — handles everything else,
+ * in particular the login form shown when a user authorizes the
+ * "my-client" authorization_code flow.
  */
 @Configuration
 public class SecurityConfig {
@@ -28,22 +29,19 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
-                OAuth2AuthorizationServerConfigurer.authorizationServer();
+        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
 
         http
-            .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
-            .with(authorizationServerConfigurer, (authorizationServer) ->
-                authorizationServer.oidc(withDefaults -> {})
-            )
-            .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
-            .exceptionHandling(exceptions -> exceptions
-                .defaultAuthenticationEntryPointFor(
-                    new org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint("/login"),
-                    new org.springframework.security.web.util.matcher.MediaTypeRequestMatcher(org.springframework.http.MediaType.TEXT_HTML)
-                )
-            )
-            .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+                .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
+                .with(authorizationServerConfigurer, Customizer.withDefaults())
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+                .exceptionHandling(exceptions -> exceptions
+                        .defaultAuthenticationEntryPointFor(
+                                new org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint(
+                                        "/login"),
+                                new org.springframework.security.web.util.matcher.MediaTypeRequestMatcher(
+                                        org.springframework.http.MediaType.TEXT_HTML)))
+                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
 
         return http.build();
     }
@@ -52,10 +50,10 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(authorize -> authorize
-                .anyRequest().authenticated()
-            )
-            .formLogin(withDefaults -> {});
+                .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest().authenticated())
+                .formLogin(withDefaults -> {
+                });
 
         return http.build();
     }

@@ -1,6 +1,7 @@
 package com.example.apigateway.config;
 
 import org.springframework.cloud.gateway.filter.ratelimit.RateLimiter;
+import org.springframework.cloud.gateway.support.ConfigurationService;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -16,14 +17,15 @@ import java.util.concurrent.atomic.AtomicLong;
  * in pom.xml and reference "redis-rate-limiter" in application.yml instead).
  *
  * Config per route key (set via RouteLocator or application.yml args):
- *   replenishRate — tokens added back per second
- *   burstCapacity — bucket size / max burst
+ * replenishRate — tokens added back per second
+ * burstCapacity — bucket size / max burst
  */
 @Component
 public class InMemoryRateLimiter implements RateLimiter<InMemoryRateLimiter.Config> {
 
     private final ConcurrentHashMap<String, Bucket> buckets = new ConcurrentHashMap<>();
-    private Config defaultConfig = new Config(5, 10); // 5 req/sec, burst of 10
+    private final Config defaultConfig = new Config(5, 10); // 5 req/sec, burst of 10
+    private ConfigurationService configurationService;
 
     @Override
     public Mono<Response> isAllowed(String routeId, String id) {
@@ -37,8 +39,7 @@ public class InMemoryRateLimiter implements RateLimiter<InMemoryRateLimiter.Conf
         Response response = new Response(allowed, java.util.Map.of(
                 "X-RateLimit-Remaining", String.valueOf(Math.max(remaining, 0)),
                 "X-RateLimit-Burst-Capacity", String.valueOf(config.getBurstCapacity()),
-                "X-RateLimit-Replenish-Rate", String.valueOf(config.getReplenishRate())
-        ));
+                "X-RateLimit-Replenish-Rate", String.valueOf(config.getReplenishRate())));
         return Mono.just(response);
     }
 
@@ -57,21 +58,43 @@ public class InMemoryRateLimiter implements RateLimiter<InMemoryRateLimiter.Conf
         return defaultConfig;
     }
 
+    @Override
+    public void setConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
+
+    @Override
+    public ConfigurationService getConfigurationService() {
+        return configurationService;
+    }
+
     public static class Config {
         private int replenishRate;
         private int burstCapacity;
 
-        public Config() {}
+        public Config() {
+        }
 
         public Config(int replenishRate, int burstCapacity) {
             this.replenishRate = replenishRate;
             this.burstCapacity = burstCapacity;
         }
 
-        public int getReplenishRate() { return replenishRate; }
-        public void setReplenishRate(int replenishRate) { this.replenishRate = replenishRate; }
-        public int getBurstCapacity() { return burstCapacity; }
-        public void setBurstCapacity(int burstCapacity) { this.burstCapacity = burstCapacity; }
+        public int getReplenishRate() {
+            return replenishRate;
+        }
+
+        public void setReplenishRate(int replenishRate) {
+            this.replenishRate = replenishRate;
+        }
+
+        public int getBurstCapacity() {
+            return burstCapacity;
+        }
+
+        public void setBurstCapacity(int burstCapacity) {
+            this.burstCapacity = burstCapacity;
+        }
     }
 
     private static class Bucket {
